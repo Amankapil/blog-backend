@@ -28,13 +28,10 @@ exports.createPost = async (req, res) => {
     return res.status(400).json({ message: "All fields are required" });
   }
 
-  const imageUrl = req.file ? `/uploads/${req.file.filename}` : null; // Get the uploaded image URL
-
   const post = new Post({
     title,
     content,
     author,
-    image: imageUrl, // Save the image URL
   });
 
   try {
@@ -56,10 +53,6 @@ exports.updatePost = async (req, res) => {
     if (content) post.content = content;
     if (author) post.author = author;
 
-    if (req.file) {
-      post.image = `/uploads/${req.file.filename}`; // Update the image URL if a new image is uploaded
-    }
-
     const updatedPost = await post.save();
     res.json(updatedPost);
   } catch (err) {
@@ -73,12 +66,7 @@ exports.deletePost = async (req, res) => {
     const post = await Post.findById(req.params.id);
     if (!post) return res.status(404).json({ message: "Post not found" });
 
-    // Optionally, you could delete the image file from the filesystem here
-    // const imagePath = post.image;
-    // if (imagePath) {
-    //   fs.unlinkSync(`.${imagePath}`);
-    // }
-
+    // await post.remove(req.params.id);
     await Post.findByIdAndDelete(req.params.id);
     res.json({ message: "Post deleted" });
   } catch (err) {
